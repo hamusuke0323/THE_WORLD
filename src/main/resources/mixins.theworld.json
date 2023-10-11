@@ -1,0 +1,28 @@
+{
+  "required": true,
+  "package": "com.hamusuke.theworld.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "EntityEndermanMixin",
+    "EntityItemMixin",
+    "EntityLivingBaseMixin",
+    "EntityLivingMixin",
+    "EntityMixin",
+    "EntityPlayerMixin",
+    "WorldMixin",
+    "WorldServerMixin"
+  ],
+  "client": [
+    "client.EntityRendererMixin",
+    "client.GuiIngameMixin",
+    "client.MinecraftMixin",
+    "client.ParticleManagerMixin",
+    "client.RenderManagerMixin",
+    "client.SoundHandlerMixin",
+    "client.WorldClientMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "mixins.theworld.refmap.json"
+}

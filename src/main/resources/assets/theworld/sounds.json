@@ -1,0 +1,12 @@
+{
+  "the_world": {
+    "sounds": [
+      "theworld:the_world"
+    ]
+  },
+  "the_world_released": {
+    "sounds": [
+      "theworld:the_world_released"
+    ]
+  }
+}
