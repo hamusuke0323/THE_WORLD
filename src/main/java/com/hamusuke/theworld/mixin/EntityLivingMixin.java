@@ -59,8 +59,6 @@ public abstract class EntityLivingMixin extends EntityLivingBaseMixin implements
             this.world.profiler.startSection("controls");
             this.world.profiler.startSection("move");
             this.moveHelper.onUpdateMoveHelper();
-            this.world.profiler.endStartSection("look");
-            this.lookHelper.onUpdateLook();
             this.world.profiler.endStartSection("jump");
             this.jumpHelper.doJump();
             this.world.profiler.endSection();

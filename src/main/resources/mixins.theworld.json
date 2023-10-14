@@ -3,12 +3,15 @@
   "package": "com.hamusuke.theworld.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "EntityArrowMixin",
     "EntityEndermanMixin",
+    "EntityFallingBlockMixin",
     "EntityItemMixin",
     "EntityLivingBaseMixin",
     "EntityLivingMixin",
     "EntityMixin",
     "EntityPlayerMixin",
+    "NetHandlerPlayServerMixin",
     "WorldMixin",
     "WorldServerMixin"
   ],
@@ -19,6 +22,7 @@
     "client.ParticleManagerMixin",
     "client.RenderManagerMixin",
     "client.SoundHandlerMixin",
+    "client.SoundManagerMixin",
     "client.WorldClientMixin"
   ],
   "injectors": {

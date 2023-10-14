@@ -16,7 +16,7 @@ public abstract class RenderManagerMixin {
 
     @ModifyVariable(method = "renderEntityStatic", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private float renderEntityStatic(float partialTicks, Entity entityIn) {
-        if (!THE_WORLDUtil.updatableInStoppedTime(this.world, entityIn)) {
+        if (!THE_WORLDUtil.updatableInStoppedTime(this.world, entityIn) && !THE_WORLDUtil.movableInStoppedTime(this.world, entityIn)) {
             return 1.0F;
         }
 

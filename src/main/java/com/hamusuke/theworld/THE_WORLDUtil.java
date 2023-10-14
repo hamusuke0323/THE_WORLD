@@ -3,6 +3,7 @@ package com.hamusuke.theworld;
 import com.hamusuke.theworld.config.CommonConfig;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,14 +21,11 @@ public class THE_WORLDUtil {
     }
 
     public static boolean movableInStoppedTime(Object theWORLD, Entity entity) {
-        return false; // TODO
-        /*
         if (!WorldInvoker.stopping((World) theWORLD)) {
             return true;
         }
 
         return entity instanceof EntityLiving && ((EntityLiving) entity).getLeashed();
-        */
     }
 
     public static int getAdjustedCoolDown(int curTimeOverTicks) {

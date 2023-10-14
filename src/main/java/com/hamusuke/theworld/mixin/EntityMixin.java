@@ -2,14 +2,18 @@ package com.hamusuke.theworld.mixin;
 
 import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.invoker.WorldInvoker;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,6 +24,9 @@ import java.util.Random;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
+    @Unique
+    private static final float DEG2RAD = 0.017453292F;
+
     @Shadow
     public World world;
 
@@ -65,6 +72,23 @@ public abstract class EntityMixin {
     public void onUpdate() {
     }
 
+    @Shadow
+    public double motionX;
+
+    @Shadow
+    public double motionY;
+
+    @Shadow
+    public double motionZ;
+
+    @Unique
+    protected boolean firstVelocityChanged;
+
+    @Inject(method = "onUpdate", at = @At("HEAD"))
+    private void onUpdate(CallbackInfo ci) {
+        this.firstVelocityChanged = false;
+    }
+
     @Inject(method = "canBeCollidedWith", at = @At("HEAD"), cancellable = true)
     private void canBeCollidedWith(CallbackInfoReturnable<Boolean> cir) {
         if (WorldInvoker.stopping(this.world)) {
@@ -72,9 +96,19 @@ public abstract class EntityMixin {
         }
     }
 
-    @Inject(method = "attackEntityFrom", at = @At("HEAD"))
+    @Inject(method = "attackEntityFrom", at = @At("HEAD"), cancellable = true)
     private void attackEntityFrom(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (source.getTrueSource() instanceof EntityPlayer && WorldInvoker.stopping(this.world)) {
+            Entity entity = source.getTrueSource();
+            int i = EnchantmentHelper.getKnockbackModifier((EntityLivingBase) entity) + 1;
+            if (!this.firstVelocityChanged) {
+                this.firstVelocityChanged = true;
+                this.motionX = -MathHelper.sin(entity.rotationYaw * DEG2RAD) * Math.abs(this.motionX);
+                this.motionY = -MathHelper.sin(entity.rotationPitch * DEG2RAD) * Math.abs(this.motionY);
+                this.motionZ = MathHelper.cos(entity.rotationYaw * DEG2RAD) * Math.abs(this.motionZ);
+            } else {
+                this.addVelocity(-MathHelper.sin(entity.rotationYaw * DEG2RAD) * i * 0.25F, -MathHelper.sin(entity.rotationPitch * DEG2RAD) * 0.25F, MathHelper.cos(entity.rotationYaw * DEG2RAD) * i * 0.25F);
+            }
             cir.setReturnValue(true);
         }
     }

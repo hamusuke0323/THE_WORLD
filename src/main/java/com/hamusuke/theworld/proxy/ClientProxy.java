@@ -4,6 +4,7 @@ import com.hamusuke.theworld.THE_WORLD;
 import com.hamusuke.theworld.client.THE_WORLDClient;
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.MinecraftInvoker;
+import com.hamusuke.theworld.invoker.SoundHandlerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectPacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
@@ -56,6 +57,7 @@ public final class ClientProxy extends CommonProxy {
 
     private void playTHE_WORLD_SE(EntityPlayer client, EntityPlayer stopper, ResourceLocation resourceLocation) {
         if (client.equals(stopper)) {
+            SoundHandlerInvoker.getInvoker(mc.getSoundHandler()).stopTHE_WORLDSounds();
             mc.getSoundHandler().playSound(new PositionedSoundRecord(resourceLocation, SoundCategory.PLAYERS, 1.0F, 1.0F, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F));
         }
     }
@@ -72,8 +74,6 @@ public final class ClientProxy extends CommonProxy {
         boolean isStopper = mc.player.equals(stopper);
         mc.getSoundHandler().resumeSounds();
         if (isStopper) {
-            mc.getSoundHandler().stop(THE_WORLD.THE_WORLD_ID.toString(), SoundCategory.PLAYERS);
-            mc.getSoundHandler().stop(THE_WORLD.THE_WORLD_RELEASED_ID.toString(), SoundCategory.PLAYERS);
             mcInvoker.get().finishNPInverse();
             this.playTHE_WORLD_SE(mc.player, stopper, THE_WORLD.THE_WORLD_RELEASED_ID);
         }

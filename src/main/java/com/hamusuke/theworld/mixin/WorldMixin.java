@@ -15,7 +15,6 @@ import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.profiler.Profiler;
@@ -76,15 +75,24 @@ public abstract class WorldMixin implements WorldInvoker {
     @Shadow
     public abstract boolean tickUpdates(boolean runAllPending);
 
-    @Shadow @Final protected List<Entity> unloadedEntityList;
+    @Shadow
+    @Final
+    protected List<Entity> unloadedEntityList;
 
-    @Shadow protected abstract boolean isChunkLoaded(int x, int z, boolean allowEmpty);
+    @Shadow
+    protected abstract boolean isChunkLoaded(int x, int z, boolean allowEmpty);
 
-    @Shadow public abstract Chunk getChunkFromChunkCoords(int chunkX, int chunkZ);
+    @Shadow
+    public abstract Chunk getChunkFromChunkCoords(int chunkX, int chunkZ);
 
-    @Shadow public abstract void onEntityRemoved(Entity entityIn);
+    @Shadow
+    public abstract void onEntityRemoved(Entity entityIn);
 
-    @Shadow public abstract void removeEntity(Entity entityIn);
+    @Shadow
+    public abstract void removeEntity(Entity entityIn);
+
+    @Shadow
+    public abstract void updateEntityWithOptionalForce(Entity entityIn, boolean forceUpdate);
 
     @Unique
     protected boolean timeStopping;
@@ -183,16 +191,10 @@ public abstract class WorldMixin implements WorldInvoker {
                             ((EntityLiving) entity).onLivingUpdate();
                             EntityLiving living = (EntityLiving) entity;
 
+                            this.updateEntityWithOptionalForce(entity, false);
+
                             if (!entity.world.isRemote) {
                                 ((EntityLivingInvoker) living).updateLeashedStateV();
-
-                                if (entity.ticksExisted % 5 == 0) {
-                                    boolean flag = !(living.getControllingPassenger() instanceof EntityLiving);
-                                    boolean flag1 = !(living.getRidingEntity() instanceof EntityBoat);
-                                    living.tasks.setControlFlag(1, flag);
-                                    living.tasks.setControlFlag(4, flag && flag1);
-                                    living.tasks.setControlFlag(2, flag);
-                                }
                             }
                         }
 
