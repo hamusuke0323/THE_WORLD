@@ -1,9 +1,6 @@
 package com.hamusuke.theworld.network;
 
-import com.hamusuke.theworld.network.packet.c2s.DeclareTHE_WORLDPacket;
-import com.hamusuke.theworld.network.packet.c2s.ReleaseTHE_WORLDPacket;
-import com.hamusuke.theworld.network.packet.c2s.TimeIsAboutToStopPacket;
-import com.hamusuke.theworld.network.packet.c2s.TimeStoppedPacket;
+import com.hamusuke.theworld.network.packet.c2s.*;
 import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectPacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessPacket;
@@ -25,6 +22,7 @@ public final class NetworkManager {
 
     public static void init() {
         INSTANCE.registerMessage(DeclareTHE_WORLDPacket.class, DeclareTHE_WORLDPacket.class, generator.get(), Side.SERVER);
+        INSTANCE.registerMessage(ReleaseLeashedEntitiesRequestPacket.class, ReleaseLeashedEntitiesRequestPacket.class, generator.get(), Side.SERVER);
         INSTANCE.registerMessage(ReleaseTHE_WORLDPacket.class, ReleaseTHE_WORLDPacket.class, generator.get(), Side.SERVER);
         INSTANCE.registerMessage(TimeIsAboutToStopPacket.class, TimeIsAboutToStopPacket.class, generator.get(), Side.SERVER);
         INSTANCE.registerMessage(TimeStoppedPacket.class, TimeStoppedPacket.class, generator.get(), Side.SERVER);

@@ -1,5 +1,6 @@
 package com.hamusuke.theworld.mixin.client;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.hamusuke.theworld.THE_WORLD;
 import com.hamusuke.theworld.invoker.SoundManagerInvoker;
@@ -37,9 +38,9 @@ public abstract class SoundManagerMixin implements SoundManagerInvoker {
     public abstract void stop(String p_189567_1_, SoundCategory p_189567_2_);
 
     @Override
-    public void stopTHE_WORLDSounds() {
+    public synchronized void stopTHE_WORLDSounds() {
         if (this.loaded) {
-            List<String> soundsToBeStopped = this.playingSounds.entrySet().stream().filter(e -> e.getValue().getSoundLocation().equals(THE_WORLD.THE_WORLD_ID) || e.getValue().getSoundLocation().equals(THE_WORLD.THE_WORLD_RELEASED_ID)).map(Map.Entry::getKey).collect(Collectors.toList());
+            List<String> soundsToBeStopped = ImmutableMap.copyOf(this.playingSounds).entrySet().stream().filter(e -> e.getValue().getSoundLocation().equals(THE_WORLD.THE_WORLD_ID) || e.getValue().getSoundLocation().equals(THE_WORLD.THE_WORLD_RELEASED_ID)).map(Map.Entry::getKey).collect(Collectors.toList());
             for (String s : soundsToBeStopped) {
                 this.stop(s, null);
             }

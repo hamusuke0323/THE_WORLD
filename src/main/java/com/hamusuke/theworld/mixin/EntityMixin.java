@@ -2,14 +2,20 @@ package com.hamusuke.theworld.mixin;
 
 import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.invoker.WorldInvoker;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,9 +30,6 @@ import java.util.Random;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
-    @Unique
-    private static final float DEG2RAD = 0.017453292F;
-
     @Shadow
     public World world;
 
@@ -82,11 +85,20 @@ public abstract class EntityMixin {
     public double motionZ;
 
     @Unique
-    protected boolean firstVelocityChanged;
+    protected boolean alreadyVelocityChanged;
+
+    @Shadow
+    protected abstract void markVelocityChanged();
+
+    @Shadow
+    public abstract boolean isBurning();
+
+    @Shadow
+    public abstract void setFire(int seconds);
 
     @Inject(method = "onUpdate", at = @At("HEAD"))
     private void onUpdate(CallbackInfo ci) {
-        this.firstVelocityChanged = false;
+        this.alreadyVelocityChanged = false;
     }
 
     @Inject(method = "canBeCollidedWith", at = @At("HEAD"), cancellable = true)
@@ -96,20 +108,54 @@ public abstract class EntityMixin {
         }
     }
 
+    @Inject(method = "updateFallState", at = @At("HEAD"), cancellable = true)
+    private void updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos, CallbackInfo ci) {
+        if (WorldInvoker.stopping(this.world)) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "attackEntityFrom", at = @At("HEAD"), cancellable = true)
     private void attackEntityFrom(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (source.getTrueSource() instanceof EntityPlayer && WorldInvoker.stopping(this.world)) {
-            Entity entity = source.getTrueSource();
-            int i = EnchantmentHelper.getKnockbackModifier((EntityLivingBase) entity) + 1;
-            if (!this.firstVelocityChanged) {
-                this.firstVelocityChanged = true;
-                this.motionX = -MathHelper.sin(entity.rotationYaw * DEG2RAD) * Math.abs(this.motionX);
-                this.motionY = -MathHelper.sin(entity.rotationPitch * DEG2RAD) * Math.abs(this.motionY);
-                this.motionZ = MathHelper.cos(entity.rotationYaw * DEG2RAD) * Math.abs(this.motionZ);
+        if (!this.world.isRemote && source.getTrueSource() instanceof EntityPlayer && WorldInvoker.stopping(this.world)) {
+            EntityPlayer player = (EntityPlayer) source.getTrueSource();
+            int i = EnchantmentHelper.getKnockbackModifier(player) + 1;
+            Vec3d vec3d = player.getLookVec();
+            this.markVelocityChanged();
+
+            double x = vec3d.x * i;
+            double y = vec3d.y * i;
+            double z = vec3d.z * i;
+
+            if (!this.alreadyVelocityChanged) {
+                this.alreadyVelocityChanged = true;
+                double vecLen = MathHelper.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+                this.motionX = x * vecLen;
+                this.motionY = y * vecLen;
+                this.motionZ = z * vecLen;
             } else {
-                this.addVelocity(-MathHelper.sin(entity.rotationYaw * DEG2RAD) * i * 0.25F, -MathHelper.sin(entity.rotationPitch * DEG2RAD) * 0.25F, MathHelper.cos(entity.rotationYaw * DEG2RAD) * i * 0.25F);
+                this.addVelocity(x, y, z);
             }
+
+            int fireAspect = EnchantmentHelper.getFireAspectModifier(player);
+            if (fireAspect > 0 && !this.isBurning()) {
+                this.setFire(fireAspect * 4);
+            }
+
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "applyPlayerInteraction", at = @At("HEAD"), cancellable = true)
+    private void applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand hand, CallbackInfoReturnable<EnumActionResult> cir) {
+        if (WorldInvoker.stopping(this.world) && this instanceof IProjectile) {
+            this.motionX *= -1.0F;
+            this.motionY *= -1.0F;
+            this.motionZ *= -1.0F;
+
+            player.swingArm(hand);
+
+            cir.setReturnValue(EnumActionResult.SUCCESS);
         }
     }
 
@@ -129,7 +175,7 @@ public abstract class EntityMixin {
 
     @Inject(method = "setFire", at = @At("HEAD"), cancellable = true)
     private void setFire(int p_70015_1_, CallbackInfo ci) {
-        if (WorldInvoker.stopping(this.world) && p_70015_1_ > 0) {
+        if (WorldInvoker.stopping(this.world) && (Object) this instanceof EntityLivingBase && p_70015_1_ > 0) {
             ci.cancel();
         }
     }

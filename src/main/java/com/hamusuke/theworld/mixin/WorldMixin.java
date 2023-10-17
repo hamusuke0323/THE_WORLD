@@ -94,6 +94,9 @@ public abstract class WorldMixin implements WorldInvoker {
     @Shadow
     public abstract void updateEntityWithOptionalForce(Entity entityIn, boolean forceUpdate);
 
+    @Shadow
+    @Final
+    public List<EntityPlayer> playerEntities;
     @Unique
     protected boolean timeStopping;
     @Unique

@@ -3,12 +3,9 @@ package com.hamusuke.theworld.mixin;
 import com.hamusuke.theworld.invoker.EntityLivingInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.ai.EntityJumpHelper;
-import net.minecraft.entity.ai.EntityLookHelper;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.PathNavigate;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,14 +23,6 @@ public abstract class EntityLivingMixin extends EntityLivingBaseMixin implements
 
     @Shadow
     protected EntityMoveHelper moveHelper;
-
-    @Shadow
-    protected EntityJumpHelper jumpHelper;
-
-    @Shadow
-    @Final
-    private EntityLookHelper lookHelper;
-
     @Shadow
     protected abstract void updateLeashedState();
 
@@ -59,8 +48,6 @@ public abstract class EntityLivingMixin extends EntityLivingBaseMixin implements
             this.world.profiler.startSection("controls");
             this.world.profiler.startSection("move");
             this.moveHelper.onUpdateMoveHelper();
-            this.world.profiler.endStartSection("jump");
-            this.jumpHelper.doJump();
             this.world.profiler.endSection();
             this.world.profiler.endSection();
             ci.cancel();

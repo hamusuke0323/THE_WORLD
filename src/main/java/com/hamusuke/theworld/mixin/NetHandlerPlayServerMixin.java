@@ -24,7 +24,9 @@ public abstract class NetHandlerPlayServerMixin {
     @Inject(method = "processUseEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetHandlerPlayServer;disconnect(Lnet/minecraft/util/text/ITextComponent;)V"), cancellable = true)
     private void processUseEntity(CPacketUseEntity packetIn, CallbackInfo ci) {
         Entity entity = packetIn.getEntityFromWorld(this.serverController.getWorld(this.player.dimension));
-        this.player.attackTargetEntityWithCurrentItem(entity);
-        ci.cancel();
+        if (entity != this.player) {
+            this.player.attackTargetEntityWithCurrentItem(entity);
+            ci.cancel();
+        }
     }
 }

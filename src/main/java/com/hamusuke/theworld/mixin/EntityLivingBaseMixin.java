@@ -6,6 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -82,6 +83,20 @@ public abstract class EntityLivingBaseMixin extends EntityMixin implements Entit
     private void knockBack(Entity entityIn, float strength, double xRatio, double zRatio, CallbackInfo ci) {
         if (WorldInvoker.stopping(this.world) && !this.isEntityAlive()) {
             this.addVelocity(-xRatio * strength * 0.01D, 0.0D, -zRatio * strength * 0.01D);
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "updatePotionEffects", at = @At("HEAD"), cancellable = true)
+    private void updatePotionEffects(CallbackInfo ci) {
+        if (WorldInvoker.stopping(this.world)) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "addPotionEffect", at = @At("HEAD"), cancellable = true)
+    private void potionEffect(PotionEffect ignoredCuzTHE_WORLDTooFast, CallbackInfo ci) {
+        if (WorldInvoker.stopping(this.world)) {
             ci.cancel();
         }
     }

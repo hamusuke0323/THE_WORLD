@@ -21,7 +21,7 @@ import static com.hamusuke.theworld.THE_WORLD.*;
 public final class THE_WORLD {
 	public static final String MOD_ID = "theworld";
 	public static final String NAME = "THE WORLD";
-	public static final String VERSION = "2.0.0";
+	public static final String VERSION = "3.0.0";
 	@SidedProxy(modId = MOD_ID, serverSide = "com.hamusuke.theworld.proxy.CommonProxy", clientSide = "com.hamusuke.theworld.proxy.ClientProxy")
 	public static CommonProxy PROXY;
 	public static final ResourceLocation THE_WORLD_ID = new ResourceLocation(MOD_ID, "the_world");

@@ -28,7 +28,10 @@ public abstract class WorldServerMixin extends WorldMixin {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void tick(CallbackInfo ci) {
         if (this.timeStopping) {
-            if (!((EntityPlayerInvoker) this.stopper).isInEffect()) {
+            if (!this.playerEntities.contains(this.stopper)) {
+                this.timeLimitTicks = 0;
+                this.startTime(this.stopper);
+            } else if (!((EntityPlayerInvoker) this.stopper).isInEffect()) {
                 if (this.timeLimitTicks > 0) {
                     --this.timeLimitTicks;
                 } else if (!this.stopper.isCreative()) {

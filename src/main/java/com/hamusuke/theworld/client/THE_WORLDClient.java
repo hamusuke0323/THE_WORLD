@@ -5,6 +5,7 @@ import com.hamusuke.theworld.invoker.MinecraftInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
 import com.hamusuke.theworld.network.packet.c2s.DeclareTHE_WORLDPacket;
+import com.hamusuke.theworld.network.packet.c2s.ReleaseLeashedEntitiesRequestPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,12 +25,14 @@ import static com.hamusuke.theworld.THE_WORLDUtil.THE_WORLD_EFFECT_TICK;
 public final class THE_WORLDClient {
 	private static THE_WORLDClient INSTANCE;
 	private static final Minecraft mc = Minecraft.getMinecraft();
-	public static final KeyBinding THE_WORLD_KEY = new KeyBinding("THE_WORLD", 88, "key.categories.gameplay");
+	public static final KeyBinding THE_WORLD_KEY = new KeyBinding(THE_WORLD.MOD_ID + ".key.THE_WORLD", 47, THE_WORLD.MOD_ID + ".key.category");
+	public static final KeyBinding RELEASE_LEASHED_KEY = new KeyBinding(THE_WORLD.MOD_ID + ".key.release.leashed", 48, THE_WORLD.MOD_ID + ".key.category");
 	private static final ResourceLocation THE_WORLD_NP_INV = new ResourceLocation(THE_WORLD.MOD_ID, "textures/the_world_negaposiinv.png");
 
 	private THE_WORLDClient() {
 		INSTANCE = this;
 		ClientRegistry.registerKeyBinding(THE_WORLD_KEY);
+		ClientRegistry.registerKeyBinding(RELEASE_LEASHED_KEY);
 	}
 
 	@SubscribeEvent
@@ -39,6 +42,10 @@ public final class THE_WORLDClient {
 				if (!WorldInvoker.stopping(mc.world)) {
 					NetworkManager.sendToServer(new DeclareTHE_WORLDPacket());
 				}
+			}
+
+			while (RELEASE_LEASHED_KEY.isPressed()) {
+				NetworkManager.sendToServer(new ReleaseLeashedEntitiesRequestPacket());
 			}
 		}
 	}
