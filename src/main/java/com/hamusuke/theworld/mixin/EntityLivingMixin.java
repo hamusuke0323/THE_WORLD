@@ -1,6 +1,5 @@
 package com.hamusuke.theworld.mixin;
 
-import com.hamusuke.theworld.invoker.EntityLivingInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityMoveHelper;
@@ -14,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityLiving.class)
-public abstract class EntityLivingMixin extends EntityLivingBaseMixin implements EntityLivingInvoker {
+public abstract class EntityLivingMixin extends EntityLivingBaseMixin {
     @Shadow
     public abstract PathNavigate getNavigator();
 
@@ -23,8 +22,6 @@ public abstract class EntityLivingMixin extends EntityLivingBaseMixin implements
 
     @Shadow
     protected EntityMoveHelper moveHelper;
-    @Shadow
-    protected abstract void updateLeashedState();
 
     @Redirect(method = "processInitialInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLiving;canBeLeashedTo(Lnet/minecraft/entity/player/EntityPlayer;)Z"))
     private boolean canBeLeashedTo(EntityLiving instance, EntityPlayer player) {
@@ -52,10 +49,5 @@ public abstract class EntityLivingMixin extends EntityLivingBaseMixin implements
             this.world.profiler.endSection();
             ci.cancel();
         }
-    }
-
-    @Override
-    public void updateLeashedStateV() {
-        this.updateLeashedState();
     }
 }

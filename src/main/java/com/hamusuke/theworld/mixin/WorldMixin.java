@@ -3,7 +3,6 @@ package com.hamusuke.theworld.mixin;
 import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.config.CommonConfig;
 import com.hamusuke.theworld.invoker.EntityLivingBaseInvoker;
-import com.hamusuke.theworld.invoker.EntityLivingInvoker;
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
@@ -192,13 +191,7 @@ public abstract class WorldMixin implements WorldInvoker {
                             continue;
                         } else if (THE_WORLDUtil.movableInStoppedTime(this, entity) && !entity.updateBlocked) {
                             ((EntityLiving) entity).onLivingUpdate();
-                            EntityLiving living = (EntityLiving) entity;
-
                             this.updateEntityWithOptionalForce(entity, false);
-
-                            if (!entity.world.isRemote) {
-                                ((EntityLivingInvoker) living).updateLeashedStateV();
-                            }
                         }
 
                         if (entity.hurtResistantTime > 0 && !(entity instanceof EntityPlayer)) {

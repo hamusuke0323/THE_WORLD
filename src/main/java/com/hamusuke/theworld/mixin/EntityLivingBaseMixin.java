@@ -101,6 +101,13 @@ public abstract class EntityLivingBaseMixin extends EntityMixin implements Entit
         }
     }
 
+    @Inject(method = "collideWithEntity", at = @At("HEAD"), cancellable = true)
+    private void collideWithEntity(Entity entityIn, CallbackInfo ci) {
+        if (WorldInvoker.stopping(this.world) && !(entityIn instanceof EntityPlayer)) {
+            ci.cancel();
+        }
+    }
+
     @Override
     public void collideWithNearbyEntitiesV() {
         this.collideWithNearbyEntities();

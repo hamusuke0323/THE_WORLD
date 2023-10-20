@@ -7,7 +7,9 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
@@ -103,7 +105,7 @@ public abstract class EntityMixin {
 
     @Inject(method = "canBeCollidedWith", at = @At("HEAD"), cancellable = true)
     private void canBeCollidedWith(CallbackInfoReturnable<Boolean> cir) {
-        if (WorldInvoker.stopping(this.world)) {
+        if (WorldInvoker.stopping(this.world) && !((Object) this instanceof EntityItem)) {
             cir.setReturnValue(true);
         }
     }
@@ -140,6 +142,10 @@ public abstract class EntityMixin {
             int fireAspect = EnchantmentHelper.getFireAspectModifier(player);
             if (fireAspect > 0 && !this.isBurning()) {
                 this.setFire(fireAspect * 4);
+            }
+
+            if ((Object) this instanceof EntityArrow && !player.equals(((EntityArrow) (Object) this).shootingEntity)) {
+                ((EntityArrow) (Object) this).shootingEntity = player;
             }
 
             cir.setReturnValue(true);
