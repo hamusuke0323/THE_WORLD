@@ -2,6 +2,7 @@ package com.hamusuke.theworld.mixin;
 
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import net.minecraft.server.management.PlayerChunkMap;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldServer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,6 +40,10 @@ public abstract class WorldServerMixin extends WorldMixin {
                 }
             }
 
+            if (this.getWorldInfo().isHardcoreModeEnabled() && this.getDifficulty() != EnumDifficulty.HARD) {
+                this.getWorldInfo().setDifficulty(EnumDifficulty.HARD);
+            }
+
             this.provider.getBiomeProvider().cleanupCache();
             this.profiler.endStartSection("chunkSource");
             this.chunkProvider.tick();
@@ -48,14 +53,14 @@ public abstract class WorldServerMixin extends WorldMixin {
                 this.setSkylightSubtracted(j);
             }
 
-            this.profiler.endStartSection("tickPending");
-            this.tickUpdates(false);
-            this.profiler.endStartSection("tickBlocks");
-            this.updateBlocks();
+            //this.profiler.endStartSection("tickPending");
+            //this.tickUpdates(false);
+            //this.profiler.endStartSection("tickBlocks");
+            //this.updateBlocks();
             this.profiler.endStartSection("chunkMap");
             this.playerChunkMap.tick();
             this.profiler.endSection();
-            this.sendQueuedBlockEvents();
+            //this.sendQueuedBlockEvents();
 
             ci.cancel();
         }

@@ -3,6 +3,8 @@ package com.hamusuke.theworld;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
 import com.hamusuke.theworld.proxy.CommonProxy;
+import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,7 +23,7 @@ import static com.hamusuke.theworld.THE_WORLD.*;
 public final class THE_WORLD {
 	public static final String MOD_ID = "theworld";
 	public static final String NAME = "THE WORLD";
-	public static final String VERSION = "3.0.1";
+	public static final String VERSION = "3.2.0";
 	@SidedProxy(modId = MOD_ID, serverSide = "com.hamusuke.theworld.proxy.CommonProxy", clientSide = "com.hamusuke.theworld.proxy.ClientProxy")
 	public static CommonProxy PROXY;
 	public static final ResourceLocation THE_WORLD_ID = new ResourceLocation(MOD_ID, "the_world");
@@ -53,8 +55,13 @@ public final class THE_WORLD {
 
 	@SubscribeEvent
 	public void onBreakSpeed(final PlayerEvent.BreakSpeed event) {
-		if (WorldInvoker.stopping(event.getEntityPlayer().world) && !event.getEntityPlayer().onGround) {
-			event.setNewSpeed(event.getNewSpeed() * 5.0F);
+		if (WorldInvoker.stopping(event.getEntityPlayer().world)) {
+			if (!event.getEntityPlayer().onGround) {
+				event.setNewSpeed(event.getNewSpeed() * 5.0F);
+			}
+			if (event.getEntityPlayer().isInsideOfMaterial(Material.WATER) && !EnchantmentHelper.getAquaAffinityModifier(event.getEntityPlayer())) {
+				event.setNewSpeed(event.getNewSpeed() * 5.0F);
+			}
 		}
 	}
 

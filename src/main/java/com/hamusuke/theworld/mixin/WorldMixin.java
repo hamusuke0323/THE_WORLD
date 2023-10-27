@@ -3,6 +3,7 @@ package com.hamusuke.theworld.mixin;
 import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.config.CommonConfig;
 import com.hamusuke.theworld.invoker.EntityLivingBaseInvoker;
+import com.hamusuke.theworld.invoker.EntityLivingInvoker;
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
@@ -16,13 +17,16 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ReportedException;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -96,6 +100,13 @@ public abstract class WorldMixin implements WorldInvoker {
     @Shadow
     @Final
     public List<EntityPlayer> playerEntities;
+
+    @Shadow
+    public abstract WorldInfo getWorldInfo();
+
+    @Shadow
+    public abstract EnumDifficulty getDifficulty();
+
     @Unique
     protected boolean timeStopping;
     @Unique
@@ -119,7 +130,9 @@ public abstract class WorldMixin implements WorldInvoker {
             NetworkManager.sendToClient(new THE_WORLDSuccessPacket(), (EntityPlayerMP) this.stopper);
             if (CommonConfig.allowFlyWhenTimeStopping && !this.stopper.capabilities.allowFlying) {
                 this.stopper.capabilities.allowFlying = true;
-                this.stopper.sendPlayerAbilities();
+                if (((EntityPlayerMP) this.stopper).connection != null) {
+                    ((EntityPlayerMP) this.stopper).connection.sendPacket(new SPacketPlayerAbilities(this.stopper.capabilities));
+                }
             }
             NetworkManager.sendToDimension(new THE_WORLDStopsTimePacket(this.stopper), this.getMinecraftServer(), this.provider.getDimension());
         }
@@ -133,6 +146,7 @@ public abstract class WorldMixin implements WorldInvoker {
 
         EntityPlayerInvoker stopper = (EntityPlayerInvoker) this.stopper;
         this.timeStopping = false;
+        this.stopper.fallDistance = 0.0F;
         if (!this.isRemote) {
             ((EntityPlayerMP) stopper).interactionManager.getGameType().configurePlayerCapabilities(this.stopper.capabilities);
             this.stopper.sendPlayerAbilities();
@@ -190,8 +204,14 @@ public abstract class WorldMixin implements WorldInvoker {
                             net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackEnd(entity);
                             continue;
                         } else if (THE_WORLDUtil.movableInStoppedTime(this, entity) && !entity.updateBlocked) {
-                            ((EntityLiving) entity).onLivingUpdate();
+                            EntityLiving living = (EntityLiving) entity;
+                            living.onLivingUpdate();
+
                             this.updateEntityWithOptionalForce(entity, false);
+
+                            if (!entity.world.isRemote) {
+                                ((EntityLivingInvoker) living).updateLeashedStateV();
+                            }
                         }
 
                         if (entity.hurtResistantTime > 0 && !(entity instanceof EntityPlayer)) {
