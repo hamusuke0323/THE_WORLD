@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @SideOnly(Side.CLIENT)
@@ -40,7 +41,7 @@ public final class ClientProxy extends CommonProxy {
     @Override
     public synchronized void onMessage(PlayerSetIsInEffectPacket packet, MessageContext ctx) {
         Entity entity = mc.world.getEntityByID(packet.getPlayerId());
-        if (invoker.get().getStopper().equals(entity)) {
+        if (Objects.equals(invoker.get().getStopper(), entity)) {
             ((EntityPlayerInvoker) invoker.get().getStopper()).setIsInEffect(packet.getFlag());
         }
     }

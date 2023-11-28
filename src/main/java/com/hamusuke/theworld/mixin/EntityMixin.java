@@ -10,7 +10,6 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -34,10 +33,6 @@ import java.util.Random;
 public abstract class EntityMixin {
     @Shadow
     public World world;
-
-    @Shadow
-    @Nullable
-    public abstract MinecraftServer getServer();
 
     @Shadow
     public int hurtResistantTime;
@@ -158,6 +153,7 @@ public abstract class EntityMixin {
             this.motionX *= -1.0F;
             this.motionY *= -1.0F;
             this.motionZ *= -1.0F;
+            this.markVelocityChanged();
 
             player.swingArm(hand);
 

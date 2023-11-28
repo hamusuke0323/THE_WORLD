@@ -30,7 +30,7 @@ public abstract class EntityPlayerMixin extends EntityMixin implements EntityPla
     @Inject(method = "getCooledAttackStrength", at = @At("RETURN"), cancellable = true)
     private void getCooledAttackStrength(float adjustTicks, CallbackInfoReturnable<Float> cir) {
         if (WorldInvoker.stopping(this.world)) {
-            cir.setReturnValue(1.0F);
+            cir.setReturnValue(1.0F); // TOO FAST SO THAT TIME SEEMS TO STOP RELATIVELY...?
         }
     }
 
@@ -41,7 +41,7 @@ public abstract class EntityPlayerMixin extends EntityMixin implements EntityPla
             if (!flag) {
                 ((WorldInvoker) this.world).setTimeLimitTicks(CommonConfig.timeLimitTicks);
             }
-            NetworkManager.sendToDimension(new PlayerSetIsInEffectPacket((EntityPlayer) (Object) this), this.getServer(), this.world.provider.getDimension());
+            NetworkManager.sendToDimension(new PlayerSetIsInEffectPacket((EntityPlayer) (Object) this), this.world.provider.getDimension());
         }
     }
 

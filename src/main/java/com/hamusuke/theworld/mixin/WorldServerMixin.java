@@ -17,15 +17,6 @@ public abstract class WorldServerMixin extends WorldMixin {
     @Final
     private PlayerChunkMap playerChunkMap;
 
-    @Shadow
-    protected abstract void sendQueuedBlockEvents();
-
-    @Shadow
-    protected abstract void updateBlocks();
-
-    @Shadow
-    public abstract boolean tickUpdates(boolean runAllPending);
-
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void tick(CallbackInfo ci) {
         if (this.timeStopping) {

@@ -13,6 +13,7 @@
     "EntityMixin",
     "EntityPlayerMixin",
     "NetHandlerPlayServerMixin",
+    "NetworkManagerMixin",
     "WorldMixin",
     "WorldServerMixin"
   ],

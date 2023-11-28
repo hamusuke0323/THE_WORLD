@@ -6,7 +6,6 @@ import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessPacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverPacket;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -37,8 +36,8 @@ public final class NetworkManager {
         INSTANCE.sendTo(packet, serverPlayer);
     }
 
-    public static void sendToDimension(IMessage packet, MinecraftServer server, int dim) {
-        server.getPlayerList().getPlayers().stream().filter(e -> e.dimension == dim).forEach(e -> sendToClient(packet, e));
+    public static void sendToDimension(IMessage packet, int dim) {
+        INSTANCE.sendToDimension(packet, dim);
     }
 
     public static void sendToServer(IMessage packet) {

@@ -14,6 +14,14 @@ public interface WorldInvoker {
 
     void setTimeLimitTicks(int ticks);
 
+    static WorldInvoker invoker(Object object) {
+        return (WorldInvoker) object;
+    }
+
+    static boolean stopping(Object world) {
+        return stopping((World) world);
+    }
+
     static boolean stopping(World world) {
         return world != null && ((WorldInvoker) world).timeStopping();
     }

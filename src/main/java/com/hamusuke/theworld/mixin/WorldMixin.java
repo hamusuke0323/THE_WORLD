@@ -10,6 +10,7 @@ import com.hamusuke.theworld.network.NetworkManager;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessPacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverPacket;
+import net.minecraft.block.material.Material;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
@@ -21,6 +22,7 @@ import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -34,6 +36,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -74,9 +77,6 @@ public abstract class WorldMixin implements WorldInvoker {
     @Shadow
     @Final
     public List<Entity> loadedEntityList;
-
-    @Shadow
-    public abstract boolean tickUpdates(boolean runAllPending);
 
     @Shadow
     @Final
@@ -134,7 +134,7 @@ public abstract class WorldMixin implements WorldInvoker {
                     ((EntityPlayerMP) this.stopper).connection.sendPacket(new SPacketPlayerAbilities(this.stopper.capabilities));
                 }
             }
-            NetworkManager.sendToDimension(new THE_WORLDStopsTimePacket(this.stopper), this.getMinecraftServer(), this.provider.getDimension());
+            NetworkManager.sendToDimension(new THE_WORLDStopsTimePacket(this.stopper), this.provider.getDimension());
         }
     }
 
@@ -150,7 +150,7 @@ public abstract class WorldMixin implements WorldInvoker {
         if (!this.isRemote) {
             ((EntityPlayerMP) stopper).interactionManager.getGameType().configurePlayerCapabilities(this.stopper.capabilities);
             this.stopper.sendPlayerAbilities();
-            NetworkManager.sendToDimension(new THE_WORLDTimeOverPacket(), this.getMinecraftServer(), this.provider.getDimension());
+            NetworkManager.sendToDimension(new THE_WORLDTimeOverPacket(), this.provider.getDimension());
             stopper.setCoolDownTicks(THE_WORLDUtil.getAdjustedCoolDown(this.timeLimitTicks));
         }
     }
@@ -254,6 +254,20 @@ public abstract class WorldMixin implements WorldInvoker {
             this.profiler.endSection();
 
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "updateEntity", at = @At("HEAD"), cancellable = true)
+    private void updateEntity(Entity entity, CallbackInfo ci) {
+        if (WorldInvoker.stopping(this) && entity instanceof EntityPlayer && !(entity.equals(WorldInvoker.invoker(this).getStopper()))) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "handleMaterialAcceleration", at = @At("HEAD"), cancellable = true)
+    private void handleMaterialAcceleration(AxisAlignedBB bb, Material materialIn, Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
+        if (WorldInvoker.stopping(this)) {
+            cir.setReturnValue(false);
         }
     }
 
