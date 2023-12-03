@@ -1,6 +1,10 @@
 package com.hamusuke.theworld.invoker;
 
 public interface EntityPlayerInvoker {
+    boolean isLoggedIn();
+
+    void setLoggedIn(boolean isLoggedIn);
+
     void setIsInEffect(boolean flag);
 
     boolean isInEffect();

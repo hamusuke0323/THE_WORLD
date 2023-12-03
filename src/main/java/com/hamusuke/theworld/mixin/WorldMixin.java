@@ -7,9 +7,9 @@ import com.hamusuke.theworld.invoker.EntityLivingInvoker;
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverS2CPacket;
 import net.minecraft.block.material.Material;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -20,7 +20,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.profiler.Profiler;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.EnumDifficulty;
@@ -45,11 +44,6 @@ public abstract class WorldMixin implements WorldInvoker {
     @Shadow
     @Final
     public boolean isRemote;
-
-    @Shadow
-    @javax.annotation.Nullable
-    public abstract MinecraftServer getMinecraftServer();
-
     @Shadow
     @Final
     public WorldProvider provider;
@@ -127,14 +121,14 @@ public abstract class WorldMixin implements WorldInvoker {
         this.stopper = stopper;
         this.timeStopping = true;
         if (!this.isRemote) {
-            NetworkManager.sendToClient(new THE_WORLDSuccessPacket(), (EntityPlayerMP) this.stopper);
+            NetworkManager.sendToClient(new THE_WORLDSuccessS2CPacket(), (EntityPlayerMP) this.stopper);
             if (CommonConfig.allowFlyWhenTimeStopping && !this.stopper.capabilities.allowFlying) {
                 this.stopper.capabilities.allowFlying = true;
                 if (((EntityPlayerMP) this.stopper).connection != null) {
                     ((EntityPlayerMP) this.stopper).connection.sendPacket(new SPacketPlayerAbilities(this.stopper.capabilities));
                 }
             }
-            NetworkManager.sendToDimension(new THE_WORLDStopsTimePacket(this.stopper), this.provider.getDimension());
+            NetworkManager.sendToDimension(new THE_WORLDStopsTimeS2CPacket(this.stopper), this.provider.getDimension());
         }
     }
 
@@ -150,7 +144,7 @@ public abstract class WorldMixin implements WorldInvoker {
         if (!this.isRemote) {
             ((EntityPlayerMP) stopper).interactionManager.getGameType().configurePlayerCapabilities(this.stopper.capabilities);
             this.stopper.sendPlayerAbilities();
-            NetworkManager.sendToDimension(new THE_WORLDTimeOverPacket(), this.provider.getDimension());
+            NetworkManager.sendToDimension(new THE_WORLDTimeOverS2CPacket(), this.provider.getDimension());
             stopper.setCoolDownTicks(THE_WORLDUtil.getAdjustedCoolDown(this.timeLimitTicks));
         }
     }

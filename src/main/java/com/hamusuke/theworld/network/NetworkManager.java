@@ -1,10 +1,10 @@
 package com.hamusuke.theworld.network;
 
 import com.hamusuke.theworld.network.packet.c2s.*;
-import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverPacket;
+import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverS2CPacket;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -19,17 +19,24 @@ public final class NetworkManager {
     private static final AtomicInteger ID = new AtomicInteger();
     private static final Supplier<Integer> generator = ID::getAndIncrement;
 
-    public static void init() {
-        INSTANCE.registerMessage(DeclareTHE_WORLDPacket.class, DeclareTHE_WORLDPacket.class, generator.get(), Side.SERVER);
-        INSTANCE.registerMessage(ReleaseLeashedEntitiesRequestPacket.class, ReleaseLeashedEntitiesRequestPacket.class, generator.get(), Side.SERVER);
-        INSTANCE.registerMessage(ReleaseTHE_WORLDPacket.class, ReleaseTHE_WORLDPacket.class, generator.get(), Side.SERVER);
-        INSTANCE.registerMessage(TimeIsAboutToStopPacket.class, TimeIsAboutToStopPacket.class, generator.get(), Side.SERVER);
-        INSTANCE.registerMessage(TimeStoppedPacket.class, TimeStoppedPacket.class, generator.get(), Side.SERVER);
+    public static void registerPackets() {
+        registerClient2ServerPackets();
+        registerServer2ClientPackets();
+    }
 
-        INSTANCE.registerMessage(PlayerSetIsInEffectPacket.class, PlayerSetIsInEffectPacket.class, generator.get(), Side.CLIENT);
-        INSTANCE.registerMessage(THE_WORLDStopsTimePacket.class, THE_WORLDStopsTimePacket.class, generator.get(), Side.CLIENT);
-        INSTANCE.registerMessage(THE_WORLDSuccessPacket.class, THE_WORLDSuccessPacket.class, generator.get(), Side.CLIENT);
-        INSTANCE.registerMessage(THE_WORLDTimeOverPacket.class, THE_WORLDTimeOverPacket.class, generator.get(), Side.CLIENT);
+    private static void registerClient2ServerPackets() {
+        INSTANCE.registerMessage(DeclareTHE_WORLDC2SPacket.class, DeclareTHE_WORLDC2SPacket.class, generator.get(), Side.SERVER);
+        INSTANCE.registerMessage(ReleaseLeashedEntitiesRequestC2SPacket.class, ReleaseLeashedEntitiesRequestC2SPacket.class, generator.get(), Side.SERVER);
+        INSTANCE.registerMessage(ReleaseTHE_WORLDC2SPacket.class, ReleaseTHE_WORLDC2SPacket.class, generator.get(), Side.SERVER);
+        INSTANCE.registerMessage(TimeIsAboutToStopC2SPacket.class, TimeIsAboutToStopC2SPacket.class, generator.get(), Side.SERVER);
+        INSTANCE.registerMessage(TimeStoppedC2SPacket.class, TimeStoppedC2SPacket.class, generator.get(), Side.SERVER);
+    }
+
+    private static void registerServer2ClientPackets() {
+        INSTANCE.registerMessage(PlayerSetIsInEffectS2CPacket.class, PlayerSetIsInEffectS2CPacket.class, generator.get(), Side.CLIENT);
+        INSTANCE.registerMessage(THE_WORLDStopsTimeS2CPacket.class, THE_WORLDStopsTimeS2CPacket.class, generator.get(), Side.CLIENT);
+        INSTANCE.registerMessage(THE_WORLDSuccessS2CPacket.class, THE_WORLDSuccessS2CPacket.class, generator.get(), Side.CLIENT);
+        INSTANCE.registerMessage(THE_WORLDTimeOverS2CPacket.class, THE_WORLDTimeOverS2CPacket.class, generator.get(), Side.CLIENT);
     }
 
     public static void sendToClient(IMessage packet, EntityPlayerMP serverPlayer) {

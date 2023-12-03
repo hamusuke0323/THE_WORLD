@@ -7,14 +7,14 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class PlayerSetIsInEffectPacket implements Packet<PlayerSetIsInEffectPacket> {
+public class PlayerSetIsInEffectS2CPacket implements Packet<PlayerSetIsInEffectS2CPacket> {
     private int playerId;
     private boolean flag;
 
-    public PlayerSetIsInEffectPacket() {
+    public PlayerSetIsInEffectS2CPacket() {
     }
 
-    public PlayerSetIsInEffectPacket(EntityPlayer serverPlayer) {
+    public PlayerSetIsInEffectS2CPacket(EntityPlayer serverPlayer) {
         this.playerId = serverPlayer.getEntityId();
         this.flag = ((EntityPlayerInvoker) serverPlayer).isInEffect();
     }
@@ -32,7 +32,7 @@ public class PlayerSetIsInEffectPacket implements Packet<PlayerSetIsInEffectPack
     }
 
     @Override
-    public void processPacket(PlayerSetIsInEffectPacket message, MessageContext ctx) {
+    public void processPacket(PlayerSetIsInEffectS2CPacket message, MessageContext ctx) {
         THE_WORLD.PROXY.onMessage(message, ctx);
     }
 

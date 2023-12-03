@@ -1,11 +1,13 @@
 package com.hamusuke.theworld.mixin;
 
+import com.hamusuke.theworld.invoker.EntityArrowInvoker;
 import com.hamusuke.theworld.invoker.EntityLivingBaseInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
@@ -35,6 +37,7 @@ public abstract class EntityLivingBaseMixin extends EntityMixin implements Entit
 
     @Shadow
     protected int recentlyHit;
+
     @Shadow
     protected abstract int getExperiencePoints(EntityPlayer player);
 
@@ -48,7 +51,7 @@ public abstract class EntityLivingBaseMixin extends EntityMixin implements Entit
 
     @Inject(method = "attackEntityFrom", at = @At("HEAD"))
     private void attackEntityFrom(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (WorldInvoker.stopping(this.world)) {
+        if (WorldInvoker.stopping(this.world) || (source.getImmediateSource() instanceof EntityArrow && ((EntityArrowInvoker) source.getImmediateSource()).wasTimeStopping())) {
             this.hurtResistantTime = 0;
         }
     }

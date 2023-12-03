@@ -6,13 +6,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class THE_WORLDStopsTimePacket implements Packet<THE_WORLDStopsTimePacket> {
+public class THE_WORLDStopsTimeS2CPacket implements Packet<THE_WORLDStopsTimeS2CPacket> {
     private int playerId;
 
-    public THE_WORLDStopsTimePacket() {
+    public THE_WORLDStopsTimeS2CPacket() {
     }
 
-    public THE_WORLDStopsTimePacket(EntityPlayer player) {
+    public THE_WORLDStopsTimeS2CPacket(EntityPlayer player) {
         this.playerId = player.getEntityId();
     }
 
@@ -27,7 +27,7 @@ public class THE_WORLDStopsTimePacket implements Packet<THE_WORLDStopsTimePacket
     }
 
     @Override
-    public void processPacket(THE_WORLDStopsTimePacket message, MessageContext ctx) {
+    public void processPacket(THE_WORLDStopsTimeS2CPacket message, MessageContext ctx) {
         THE_WORLD.PROXY.onMessage(message, ctx);
     }
 

@@ -41,7 +41,7 @@ public abstract class NetworkManagerMixin {
         }
 
         NetHandlerPlayServer listener = (NetHandlerPlayServer) this.packetListener;
-        if (THE_WORLDUtil.shouldBeSent(inPacket) || !WorldInvoker.stopping(listener.player.world) || listener.player.equals(WorldInvoker.invoker(listener.player.world).getStopper())) {
+        if (THE_WORLDUtil.shouldBeSent(listener.player, inPacket) || !WorldInvoker.stopping(listener.player.world) || listener.player.equals(WorldInvoker.invoker(listener.player.world).getStopper())) {
             return;
         }
 

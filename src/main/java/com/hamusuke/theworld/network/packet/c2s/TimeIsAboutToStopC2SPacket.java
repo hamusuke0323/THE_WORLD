@@ -4,9 +4,9 @@ import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.network.packet.Packet;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class TimeIsAboutToStopPacket implements Packet<TimeIsAboutToStopPacket> {
+public class TimeIsAboutToStopC2SPacket implements Packet<TimeIsAboutToStopC2SPacket> {
     @Override
-    public void processPacket(TimeIsAboutToStopPacket message, MessageContext ctx) {
+    public void processPacket(TimeIsAboutToStopC2SPacket message, MessageContext ctx) {
         ((EntityPlayerInvoker) ctx.getServerHandler().player).setIsInEffect(true);
     }
 }

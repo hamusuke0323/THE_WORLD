@@ -1,12 +1,14 @@
 package com.hamusuke.theworld;
 
 import com.hamusuke.theworld.config.CommonConfig;
+import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -48,7 +50,7 @@ public class THE_WORLDUtil {
         return Math.max((int) (CommonConfig.maxCoolDownTicks * (max - curTimeOverTicks) / (float) max), 0);
     }
 
-    public static boolean shouldBeSent(Packet<?> packet) {
-        return packet instanceof FMLProxyPacket || packet instanceof SPacketCustomPayload || packet instanceof SPacketChat || packet instanceof SPacketKeepAlive || packet instanceof SPacketJoinGame || packet instanceof SPacketDisconnect;
+    public static boolean shouldBeSent(EntityPlayerMP serverPlayer, Packet<?> packet) {
+        return !((EntityPlayerInvoker) serverPlayer).isLoggedIn() || packet instanceof SPacketSpawnPlayer || packet instanceof SPacketChunkData || packet instanceof SPacketTabComplete || packet instanceof SPacketPlayerListItem || packet instanceof FMLProxyPacket || packet instanceof SPacketCustomPayload || packet instanceof SPacketChat || packet instanceof SPacketKeepAlive || packet instanceof SPacketJoinGame || packet instanceof SPacketDisconnect;
     }
 }

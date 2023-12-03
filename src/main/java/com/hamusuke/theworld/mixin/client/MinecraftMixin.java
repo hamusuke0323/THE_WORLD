@@ -3,9 +3,9 @@ package com.hamusuke.theworld.mixin.client;
 import com.hamusuke.theworld.invoker.MinecraftInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
-import com.hamusuke.theworld.network.packet.c2s.ReleaseTHE_WORLDPacket;
-import com.hamusuke.theworld.network.packet.c2s.TimeIsAboutToStopPacket;
-import com.hamusuke.theworld.network.packet.c2s.TimeStoppedPacket;
+import com.hamusuke.theworld.network.packet.c2s.ReleaseTHE_WORLDC2SPacket;
+import com.hamusuke.theworld.network.packet.c2s.TimeIsAboutToStopC2SPacket;
+import com.hamusuke.theworld.network.packet.c2s.TimeStoppedC2SPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiGameOver;
@@ -183,7 +183,7 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
 
                 while (THE_WORLD_KEY.isPressed()) {
                     if (!this.isInNPInverse()) {
-                        NetworkManager.sendToServer(new ReleaseTHE_WORLDPacket());
+                        NetworkManager.sendToServer(new ReleaseTHE_WORLDC2SPacket());
                     }
                 }
             }
@@ -293,7 +293,7 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
     public void onDeclaredTheWorld() {
         this.isInNPInverse = true;
         this.NPInverseTick = THE_WORLD_EFFECT_TICK;
-        NetworkManager.sendToServer(new TimeIsAboutToStopPacket());
+        NetworkManager.sendToServer(new TimeIsAboutToStopC2SPacket());
     }
 
     public void finishNPInverse() {
@@ -302,7 +302,7 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
         this.player.timeInPortal = 0.0F;
         this.isInNPInverse = false;
         this.NPInverseTick = 0;
-        NetworkManager.sendToServer(new TimeStoppedPacket());
+        NetworkManager.sendToServer(new TimeStoppedC2SPacket());
     }
 
     @Override

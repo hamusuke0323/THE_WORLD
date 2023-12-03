@@ -46,7 +46,7 @@ public final class THE_WORLD {
 
 	@Mod.EventHandler
 	public void preInit(final FMLPreInitializationEvent event) {
-		NetworkManager.init();
+		NetworkManager.registerPackets();
 		PROXY.preInit(event);
 		MinecraftForge.EVENT_BUS.register(this);
 		config = new Configuration(event.getSuggestedConfigurationFile());

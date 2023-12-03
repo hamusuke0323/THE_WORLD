@@ -6,10 +6,10 @@ import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.MinecraftInvoker;
 import com.hamusuke.theworld.invoker.SoundHandlerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
-import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimePacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverPacket;
+import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverS2CPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -39,7 +39,7 @@ public final class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public synchronized void onMessage(PlayerSetIsInEffectPacket packet, MessageContext ctx) {
+    public synchronized void onMessage(PlayerSetIsInEffectS2CPacket packet, MessageContext ctx) {
         Entity entity = mc.world.getEntityByID(packet.getPlayerId());
         if (Objects.equals(invoker.get().getStopper(), entity)) {
             ((EntityPlayerInvoker) invoker.get().getStopper()).setIsInEffect(packet.getFlag());
@@ -47,7 +47,7 @@ public final class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public synchronized void onMessage(THE_WORLDStopsTimePacket packet, MessageContext ctx) {
+    public synchronized void onMessage(THE_WORLDStopsTimeS2CPacket packet, MessageContext ctx) {
         Entity entity = mc.world.getEntityByID(packet.getPlayerId());
         if (entity instanceof EntityPlayer) {
             mc.getSoundHandler().pauseSounds();
@@ -64,12 +64,12 @@ public final class ClientProxy extends CommonProxy {
     }
 
     @Override
-    public synchronized void onMessage(THE_WORLDSuccessPacket packet, MessageContext ctx) {
+    public synchronized void onMessage(THE_WORLDSuccessS2CPacket packet, MessageContext ctx) {
         mcInvoker.get().onDeclaredTheWorld();
     }
 
     @Override
-    public synchronized void onMessage(THE_WORLDTimeOverPacket packet, MessageContext ctx) {
+    public synchronized void onMessage(THE_WORLDTimeOverS2CPacket packet, MessageContext ctx) {
         EntityPlayer stopper = invoker.get().getStopper();
         invoker.get().startTime(stopper);
         boolean isStopper = mc.player.equals(stopper);
