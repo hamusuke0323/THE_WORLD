@@ -1,5 +1,6 @@
 package com.hamusuke.theworld.mixin.client;
 
+import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.invoker.MinecraftInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
@@ -8,17 +9,16 @@ import com.hamusuke.theworld.network.packet.c2s.TimeIsAboutToStopC2SPacket;
 import com.hamusuke.theworld.network.packet.c2s.TimeStoppedC2SPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiGameOver;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiSleepMP;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.RayTraceResult;
@@ -91,10 +91,14 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
     @Nullable
     private net.minecraft.network.NetworkManager myNetworkManager;
 
-    @Shadow public abstract void displayInGameMenu();
+    @Shadow
+    public GameSettings gameSettings;
 
-    @Shadow protected abstract void runTickKeyboard() throws IOException;
+    @Shadow
+    public abstract void displayInGameMenu();
 
+    @Shadow
+    protected abstract void runTickKeyboard() throws IOException;
     @Unique
     private int NPInverseTick;
     @Unique
@@ -246,14 +250,26 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
 
     @Inject(method = "processKeyBinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isHandActive()Z", shift = At.Shift.BEFORE), cancellable = true)
     private void processKeyBinds(CallbackInfo ci) {
-        if (this.isInNPInverse()) {
+        if (THE_WORLDUtil.doNotMove(this)) {
+            boolean flag2 = this.gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN;
+
+            if (flag2) {
+                while (this.gameSettings.keyBindChat.isPressed()) {
+                    this.displayGuiScreen(new GuiChat());
+                }
+
+                if (this.currentScreen == null && this.gameSettings.keyBindCommand.isPressed()) {
+                    this.displayGuiScreen(new GuiChat("/"));
+                }
+            }
+
             ci.cancel();
         }
     }
 
     @Unique
     private void runTickKeyboardInner() throws IOException {
-        if (this.isInNPInverse()) {
+        if (THE_WORLDUtil.doNotMove(this)) {
             while (Keyboard.next()) {
                 int i = Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey();
                 boolean flag = Keyboard.getEventKeyState();
@@ -280,7 +296,7 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
 
     @Unique
     private void runTickMouseInner() throws IOException {
-        if (this.isInNPInverse()) {
+        if (THE_WORLDUtil.doNotMove(this)) {
             while (Mouse.next()) {
             }
             return;

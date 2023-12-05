@@ -16,6 +16,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -46,7 +47,14 @@ public final class THE_WORLDClient {
     }
 
     @SubscribeEvent
-    public void onTick(final TickEvent.ClientTickEvent event) {
+    public void onPreTick(final TickEvent.ClientTickEvent event) {
+        if (event.phase == Phase.START) {
+            THE_WORLD.PROXY.tick();
+        }
+    }
+
+    @SubscribeEvent
+    public void onPostTick(final TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             while (THE_WORLD_KEY.isPressed()) {
                 if (!WorldInvoker.stopping(mc.world)) {
@@ -71,8 +79,8 @@ public final class THE_WORLDClient {
                 if (client.getInverseTick() > THE_WORLD_EFFECT_TICK / 2) {
                     f = 2.0F - f;
                 }
-                mc.player.prevTimeInPortal = -(float) Math.random() * 2.0F;
-                mc.player.timeInPortal = (float) ((Math.random() * 15.0F + f) * 0.25F);
+
+                mc.player.timeInPortal = f * 1.5F;
                 f *= 5.0F;
                 int i = event.getResolution().getScaledWidth();
                 int j = event.getResolution().getScaledHeight();

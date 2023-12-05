@@ -13,6 +13,9 @@ public class CommonProxy {
     public void preInit(final FMLPreInitializationEvent event) {
     }
 
+    public void tick() {
+    }
+
     public void onConfigChanged(Configuration config) {
         CommonConfig.sync(config);
     }

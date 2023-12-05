@@ -10,6 +10,8 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -139,7 +141,7 @@ public abstract class EntityMixin {
                 this.setFire(fireAspect * 4);
             }
 
-            if ((Object) this instanceof EntityArrow && !player.equals(((EntityArrow) (Object) this).shootingEntity)) {
+            if (player.getHeldItemMainhand().getItem() == Items.BOW && (Object) this instanceof EntityArrow && !player.equals(((EntityArrow) (Object) this).shootingEntity)) {
                 ((EntityArrow) (Object) this).shootingEntity = player;
             }
 
@@ -149,7 +151,8 @@ public abstract class EntityMixin {
 
     @Inject(method = "applyPlayerInteraction", at = @At("HEAD"), cancellable = true)
     private void applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand hand, CallbackInfoReturnable<EnumActionResult> cir) {
-        if (WorldInvoker.stopping(this.world) && this instanceof IProjectile) {
+        ItemStack itemStack = player.getHeldItem(hand);
+        if (itemStack.getItem() != Items.BOW && WorldInvoker.stopping(this.world) && this instanceof IProjectile) {
             this.motionX *= -1.0F;
             this.motionY *= -1.0F;
             this.motionZ *= -1.0F;

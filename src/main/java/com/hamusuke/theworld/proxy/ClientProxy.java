@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -31,11 +32,23 @@ public final class ClientProxy extends CommonProxy {
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static final Supplier<MinecraftInvoker> mcInvoker = () -> (MinecraftInvoker) mc;
     private static final Supplier<WorldInvoker> invoker = () -> (WorldInvoker) mc.world;
+    private int playerIdCache = -1;
 
     @Override
     public void preInit(final FMLPreInitializationEvent event) {
         super.preInit(event);
         MinecraftForge.EVENT_BUS.register(THE_WORLDClient.getInstance());
+    }
+
+    @Override
+    public void tick() {
+        if (this.playerIdCache >= 0) {
+            Entity entity = mc.world.getEntityByID(this.playerIdCache);
+            if (entity != null) {
+                this.playerIdCache = -1;
+                this.stop(entity);
+            }
+        }
     }
 
     @Override
@@ -49,6 +62,13 @@ public final class ClientProxy extends CommonProxy {
     @Override
     public synchronized void onMessage(THE_WORLDStopsTimeS2CPacket packet, MessageContext ctx) {
         Entity entity = mc.world.getEntityByID(packet.getPlayerId());
+        if (entity == null) {
+            this.playerIdCache = packet.getPlayerId();
+        }
+        this.stop(entity);
+    }
+
+    private void stop(@Nullable Entity entity) {
         if (entity instanceof EntityPlayer) {
             mc.getSoundHandler().pauseSounds();
             this.playTHE_WORLD_SE(mc.player, (EntityPlayer) entity, THE_WORLD.THE_WORLD_ID);
