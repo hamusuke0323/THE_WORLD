@@ -62,6 +62,7 @@ public final class THE_WORLD {
 			if (event.getEntityPlayer().isInsideOfMaterial(Material.WATER) && !EnchantmentHelper.getAquaAffinityModifier(event.getEntityPlayer())) {
 				event.setNewSpeed(event.getNewSpeed() * 5.0F);
 			}
+			event.setNewSpeed(event.getNewSpeed() * 5.0F);
 		}
 	}
 

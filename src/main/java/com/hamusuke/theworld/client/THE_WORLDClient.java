@@ -100,7 +100,7 @@ public final class THE_WORLDClient {
             }
 
             if (WorldInvoker.stopping(mc.world)) {
-                Gui.drawRect(0, 0, event.getResolution().getScaledWidth(), event.getResolution().getScaledHeight(), (Objects.equals(mc.player, WorldInvoker.invoker(mc.world).getStopper()) ? 80 : 160) << 24 | 16 << 16 | 16 << 8 | 16);
+                Gui.drawRect(0, 0, event.getResolution().getScaledWidth(), event.getResolution().getScaledHeight(), (Objects.equals(mc.player, WorldInvoker.invoker(mc.world).getStopper()) ? 120 : 160) << 24 | 16 << 16 | 16 << 8 | 16);
             }
         }
     }
