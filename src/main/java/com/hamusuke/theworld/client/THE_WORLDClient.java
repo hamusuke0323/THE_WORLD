@@ -20,8 +20,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.Objects;
-
 import static com.hamusuke.theworld.THE_WORLDUtil.THE_WORLD_EFFECT_TICK;
 
 @SideOnly(Side.CLIENT)
@@ -31,6 +29,7 @@ public final class THE_WORLDClient {
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static final ResourceLocation THE_WORLD_NP_INV = new ResourceLocation(THE_WORLD.MOD_ID, "textures/the_world_negaposiinv.png");
     private static THE_WORLDClient INSTANCE;
+    public static final ResourceLocation THE_WORLD_GRAYSCALE_SHADER = new ResourceLocation(THE_WORLD.MOD_ID, "shaders/post/grayscale.json");
 
     private THE_WORLDClient() {
         INSTANCE = this;
@@ -97,10 +96,6 @@ public final class THE_WORLDClient {
                 GlStateManager.depthMask(true);
                 GlStateManager.enableDepth();
                 GlStateManager.popMatrix();
-            }
-
-            if (WorldInvoker.stopping(mc.world)) {
-                Gui.drawRect(0, 0, event.getResolution().getScaledWidth(), event.getResolution().getScaledHeight(), (Objects.equals(mc.player, WorldInvoker.invoker(mc.world).getStopper()) ? 120 : 160) << 24 | 16 << 16 | 16 << 8 | 16);
             }
         }
     }

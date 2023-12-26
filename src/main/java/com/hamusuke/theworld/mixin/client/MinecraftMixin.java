@@ -316,8 +316,8 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
         KeyBinding.unPressAllKeys();
         KeyBinding.updateKeyBindState();
         this.player.timeInPortal = 0.0F;
-        this.isInNPInverse = false;
         this.NPInverseTick = 0;
+        this.isInNPInverse = false;
         NetworkManager.sendToServer(new TimeStoppedC2SPacket());
     }
 

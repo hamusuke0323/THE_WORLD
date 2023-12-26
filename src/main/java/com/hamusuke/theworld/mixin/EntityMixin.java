@@ -191,4 +191,11 @@ public abstract class EntityMixin {
             cir.setReturnValue(true);
         }
     }
+
+    @Inject(method = "isInLava", at = @At("RETURN"), cancellable = true)
+    private void isInLava(CallbackInfoReturnable<Boolean> cir) {
+        if (WorldInvoker.stopping(this.world)) {
+            cir.setReturnValue(false);
+        }
+    }
 }
