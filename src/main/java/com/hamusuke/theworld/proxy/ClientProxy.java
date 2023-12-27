@@ -57,10 +57,6 @@ public final class ClientProxy extends CommonProxy {
         if (Objects.equals(invoker.get().getStopper(), entity)) {
             ((EntityPlayerInvoker) invoker.get().getStopper()).setIsInEffect(packet.getFlag());
         }
-
-        if (Objects.equals(mc.player, entity) && !packet.getFlag()) {
-            mc.addScheduledTask(() -> mc.entityRenderer.loadEntityShader(mc.getRenderViewEntity()));
-        }
     }
 
     @Override
@@ -77,8 +73,9 @@ public final class ClientProxy extends CommonProxy {
             mc.addScheduledTask(mc.getSoundHandler()::pauseSounds);
             this.playTHE_WORLD_SE(mc.player, (EntityPlayer) entity, THE_WORLD.THE_WORLD_ID);
             invoker.get().stopTime((EntityPlayer) entity);
+
             if (!mc.player.equals(entity)) {
-                mc.addScheduledTask(() -> mc.entityRenderer.loadEntityShader(mc.getRenderViewEntity()));
+                mc.addScheduledTask(mcInvoker.get()::loadGrayscaleShader);
             }
         }
     }
@@ -99,7 +96,7 @@ public final class ClientProxy extends CommonProxy {
     public synchronized void onMessage(THE_WORLDTimeOverS2CPacket packet, MessageContext ctx) {
         EntityPlayer stopper = invoker.get().getStopper();
         invoker.get().startTime(stopper);
-        mc.addScheduledTask(() -> mc.entityRenderer.loadEntityShader(mc.getRenderViewEntity()));
+        mc.addScheduledTask(mcInvoker.get()::unloadGrayscaleShader);
         boolean isStopper = mc.player.equals(stopper);
         mc.addScheduledTask(mc.getSoundHandler()::resumeSounds);
         if (isStopper) {

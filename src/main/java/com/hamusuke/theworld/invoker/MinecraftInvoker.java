@@ -8,4 +8,8 @@ public interface MinecraftInvoker {
     void finishNPInverse();
 
     int getInverseTick();
+
+    void loadGrayscaleShader();
+
+    void unloadGrayscaleShader();
 }

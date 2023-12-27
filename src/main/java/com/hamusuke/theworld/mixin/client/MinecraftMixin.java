@@ -18,9 +18,11 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -99,10 +101,16 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
 
     @Shadow
     protected abstract void runTickKeyboard() throws IOException;
+
+    @Shadow
+    @Nullable
+    private Entity renderViewEntity;
     @Unique
     private int NPInverseTick;
     @Unique
     private boolean isInNPInverse;
+    @Unique
+    private boolean grayscaled;
 
     @Inject(method = "runTick", at = @At("HEAD"), cancellable = true)
     private void runTick(CallbackInfo ci) throws IOException {
@@ -114,6 +122,10 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
             FMLCommonHandler.instance().onPreClientTick();
 
             if (!this.isGamePaused) {
+                if (this.NPInverseTick < MathHelper.clamp(THE_WORLD_EFFECT_TICK - 3, 0, THE_WORLD_EFFECT_TICK)) {
+                    this.loadGrayscaleShader();
+                }
+
                 if (this.NPInverseTick > 0) {
                     --this.NPInverseTick;
                 } else if (this.isInNPInverse) {
@@ -312,6 +324,7 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
         NetworkManager.sendToServer(new TimeIsAboutToStopC2SPacket());
     }
 
+    @Override
     public void finishNPInverse() {
         KeyBinding.unPressAllKeys();
         KeyBinding.updateKeyBindState();
@@ -319,6 +332,22 @@ public abstract class MinecraftMixin implements MinecraftInvoker {
         this.NPInverseTick = 0;
         this.isInNPInverse = false;
         NetworkManager.sendToServer(new TimeStoppedC2SPacket());
+    }
+
+    @Override
+    public void loadGrayscaleShader() {
+        if (this.grayscaled) {
+            return;
+        }
+
+        this.grayscaled = true;
+        this.entityRenderer.loadEntityShader(this.renderViewEntity);
+    }
+
+    @Override
+    public void unloadGrayscaleShader() {
+        this.entityRenderer.loadEntityShader(this.renderViewEntity);
+        this.grayscaled = false;
     }
 
     @Override
