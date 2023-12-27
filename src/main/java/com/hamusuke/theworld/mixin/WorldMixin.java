@@ -265,6 +265,20 @@ public abstract class WorldMixin implements WorldInvoker {
         }
     }
 
+    @Inject(method = "isMaterialInBB", at = @At("RETURN"), cancellable = true)
+    private void isMaterialInBB(AxisAlignedBB bb, Material materialIn, CallbackInfoReturnable<Boolean> cir) {
+        if (WorldInvoker.stopping(this)) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "containsAnyLiquid", at = @At("RETURN"), cancellable = true)
+    private void containsAnyLiquid(AxisAlignedBB bb, CallbackInfoReturnable<Boolean> cir) {
+        if (WorldInvoker.stopping(this)) {
+            cir.setReturnValue(false);
+        }
+    }
+
     @Override
     public EntityPlayer getStopper() {
         return this.stopper;

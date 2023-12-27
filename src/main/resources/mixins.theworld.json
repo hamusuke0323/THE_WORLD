@@ -25,7 +25,6 @@
     "client.ParticleManagerMixin",
     "client.RenderManagerMixin",
     "client.SoundHandlerMixin",
-    "client.SoundManagerMixin",
     "client.WorldClientMixin"
   ],
   "injectors": {

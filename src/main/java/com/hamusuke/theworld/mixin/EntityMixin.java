@@ -16,6 +16,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -192,8 +193,8 @@ public abstract class EntityMixin {
         }
     }
 
-    @Inject(method = "isInLava", at = @At("RETURN"), cancellable = true)
-    private void isInLava(CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "isLiquidPresentInAABB", at = @At("RETURN"), cancellable = true)
+    private void isLiquidPresentInAABB(AxisAlignedBB bb, CallbackInfoReturnable<Boolean> cir) {
         if (WorldInvoker.stopping(this.world)) {
             cir.setReturnValue(false);
         }
