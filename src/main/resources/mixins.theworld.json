@@ -23,6 +23,7 @@
     "client.GuiIngameMixin",
     "client.MinecraftMixin",
     "client.ParticleManagerMixin",
+    "client.RenderItemMixin",
     "client.RenderManagerMixin",
     "client.SoundHandlerMixin",
     "client.WorldClientMixin"

@@ -1,8 +1,11 @@
 package com.hamusuke.theworld.mixin.client;
 
+import com.hamusuke.theworld.invoker.WorldClientInvoker;
 import com.hamusuke.theworld.mixin.WorldMixin;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,12 +15,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WorldClient.class)
-public abstract class WorldClientMixin extends WorldMixin {
+public abstract class WorldClientMixin extends WorldMixin implements WorldClientInvoker {
     @Shadow
     protected abstract void updateBlocks();
 
     @Shadow
     private ChunkProviderClient clientChunkProvider;
+
+    private long systemTime;
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void tick(CallbackInfo ci) {
@@ -36,5 +41,16 @@ public abstract class WorldClientMixin extends WorldMixin {
         if (this.timeStopping && category != SoundCategory.BLOCKS && category != SoundCategory.PLAYERS) {
             ci.cancel();
         }
+    }
+
+    @Override
+    public synchronized void stopTime(EntityPlayer stopper) {
+        this.systemTime = Minecraft.getSystemTime();
+        super.stopTime(stopper);
+    }
+
+    @Override
+    public long getSystemTime() {
+        return this.systemTime;
     }
 }

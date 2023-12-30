@@ -14,8 +14,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.Objects;
+import javax.annotation.Nullable;
 
 public class THE_WORLDUtil {
     public static final int THE_WORLD_EFFECT_TICK = 40;
@@ -25,20 +27,20 @@ public class THE_WORLDUtil {
             return true;
         }
 
-        return isEntityStopper(entity) || isTamedByStopper((WorldInvoker) theWORLD, entity) || entity.getRecursivePassengersByType(EntityPlayer.class).size() == 1 || entity instanceof EntityItem;
+        return isEntityStopper(theWORLD, entity) || isTamedByStopper(entity) || entity.getRecursivePassengersByType(EntityPlayer.class).size() == 1 || entity instanceof EntityItem;
     }
 
-    private static boolean isTamedByStopper(WorldInvoker world, Entity entity) {
+    private static boolean isTamedByStopper(Entity entity) {
         if (!(entity instanceof EntityTameable)) {
             return false;
         }
 
         EntityTameable tameable = (EntityTameable) entity;
-        return tameable.isTamed() && tameable.getOwner() != null && tameable.getOwner().equals(world.getStopper()) && tameable.getAttackingEntity() != null;
+        return tameable.isTamed() && isEntityStopper(tameable.world, tameable.getOwner()) && tameable.getAttackingEntity() != null;
     }
 
-    public static boolean isEntityStopper(Entity entity) {
-        return WorldInvoker.stopping(entity.world) && entity.equals(WorldInvoker.invoker(entity.world).getStopper());
+    public static boolean isEntityStopper(Object world, @Nullable Entity entity) {
+        return entity != null && WorldInvoker.stopping(world) && entity.equals(WorldInvoker.invoker(world).getStopper());
     }
 
     public static boolean movableInStoppedTime(Object theWORLD, Entity entity) {
@@ -58,10 +60,11 @@ public class THE_WORLDUtil {
         return !((EntityPlayerInvoker) serverPlayer).isLoggedIn() || packet instanceof SPacketSpawnPlayer || packet instanceof SPacketChunkData || packet instanceof SPacketTabComplete || packet instanceof SPacketPlayerListItem || packet instanceof FMLProxyPacket || packet instanceof SPacketCustomPayload || packet instanceof SPacketChat || packet instanceof SPacketKeepAlive || packet instanceof SPacketJoinGame || packet instanceof SPacketDisconnect;
     }
 
+    @SideOnly(Side.CLIENT)
     public static boolean doNotMove(Object mc) {
         Minecraft client = (Minecraft) mc;
         MinecraftInvoker invoker = (MinecraftInvoker) mc;
         WorldInvoker world = WorldInvoker.invoker(client.world);
-        return world.timeStopping() && (invoker.isInNPInverse() || !Objects.equals(client.player, world.getStopper()));
+        return world.timeStopping() && (invoker.isInNPInverse() || !isEntityStopper(client.world, client.player));
     }
 }

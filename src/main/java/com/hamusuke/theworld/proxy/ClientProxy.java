@@ -1,14 +1,12 @@
 package com.hamusuke.theworld.proxy;
 
 import com.hamusuke.theworld.THE_WORLD;
+import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.client.THE_WORLDClient;
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.MinecraftInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
-import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectS2CPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessS2CPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -23,7 +21,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 @SideOnly(Side.CLIENT)
@@ -50,12 +47,15 @@ public final class ClientProxy extends CommonProxy {
         }
     }
 
+    private static boolean amIStopper(Entity stopper) {
+        return mc.player.equals(stopper);
+    }
+
     @Override
-    public synchronized void onMessage(PlayerSetIsInEffectS2CPacket packet, MessageContext ctx) {
-        Entity entity = mc.world.getEntityByID(packet.getPlayerId());
-        if (Objects.equals(invoker.get().getStopper(), entity)) {
-            ((EntityPlayerInvoker) invoker.get().getStopper()).setIsInEffect(packet.getFlag());
-        }
+    public void onMessage(AskClientToReleaseTHE_WORLDEffectsS2CPacket packet, MessageContext ctx) {
+        mc.addScheduledTask(mcInvoker.get()::unloadGrayscaleShader);
+        mc.addScheduledTask(mc.getSoundHandler()::resumeSounds);
+        mcInvoker.get().finishNPInverse();
     }
 
     @Override
@@ -67,20 +67,28 @@ public final class ClientProxy extends CommonProxy {
         this.stop(entity);
     }
 
+    @Override
+    public synchronized void onMessage(PlayerSetIsInEffectS2CPacket packet, MessageContext ctx) {
+        Entity entity = mc.world.getEntityByID(packet.getPlayerId());
+        if (entity != null && THE_WORLDUtil.isEntityStopper(entity.world, entity)) {
+            ((EntityPlayerInvoker) invoker.get().getStopper()).setIsInEffect(packet.getFlag());
+        }
+    }
+
     private void stop(@Nullable Entity entity) {
         if (entity instanceof EntityPlayer) {
             mc.addScheduledTask(mc.getSoundHandler()::pauseSounds);
-            this.playTHE_WORLD_SE(mc.player, (EntityPlayer) entity, THE_WORLD.THE_WORLD_ID);
+            this.playTHE_WORLD_SE((EntityPlayer) entity, THE_WORLD.THE_WORLD_ID);
             invoker.get().stopTime((EntityPlayer) entity);
 
-            if (!mc.player.equals(entity)) {
+            if (!amIStopper(entity)) {
                 mc.addScheduledTask(mcInvoker.get()::loadGrayscaleShader);
             }
         }
     }
 
-    private void playTHE_WORLD_SE(EntityPlayer client, EntityPlayer stopper, ResourceLocation resourceLocation) {
-        if (client.equals(stopper)) {
+    private void playTHE_WORLD_SE(EntityPlayer stopper, ResourceLocation resourceLocation) {
+        if (amIStopper(stopper)) {
             mc.addScheduledTask(() -> mc.getSoundHandler().playSound(new PositionedSoundRecord(resourceLocation, SoundCategory.PLAYERS, 1.0F, 1.0F, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F)));
         }
     }
@@ -96,9 +104,10 @@ public final class ClientProxy extends CommonProxy {
         invoker.get().startTime(stopper);
         mc.addScheduledTask(mcInvoker.get()::unloadGrayscaleShader);
         mc.addScheduledTask(mc.getSoundHandler()::resumeSounds);
-        if (mc.player.equals(stopper)) {
+
+        if (amIStopper(stopper)) {
             mcInvoker.get().finishNPInverse();
-            this.playTHE_WORLD_SE(mc.player, stopper, THE_WORLD.THE_WORLD_RELEASED_ID);
+            this.playTHE_WORLD_SE(stopper, THE_WORLD.THE_WORLD_RELEASED_ID);
         }
     }
 }

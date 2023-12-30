@@ -11,6 +11,7 @@ import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessS2CPacket;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverS2CPacket;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
@@ -22,6 +23,7 @@ import net.minecraft.network.play.server.SPacketPlayerAbilities;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -101,6 +103,9 @@ public abstract class WorldMixin implements WorldInvoker {
     @Shadow
     public abstract EnumDifficulty getDifficulty();
 
+    @Shadow
+    public abstract void removeTileEntity(BlockPos pos);
+
     @Unique
     protected boolean timeStopping;
     @Unique
@@ -134,7 +139,7 @@ public abstract class WorldMixin implements WorldInvoker {
 
     @Override
     public synchronized void startTime(EntityPlayer releaser) {
-        if (!this.timeStopping || (releaser != null && !releaser.equals(this.stopper))) {
+        if (!this.timeStopping || !THE_WORLDUtil.isEntityStopper(this, releaser)) {
             return;
         }
 
@@ -153,6 +158,11 @@ public abstract class WorldMixin implements WorldInvoker {
     private void updateEntities(CallbackInfo ci) {
         if (this.timeStopping) {
             if (this.stopper != null && ((EntityPlayerInvoker) this.stopper).isInEffect()) {
+                ci.cancel();
+                return;
+            }
+
+            if (this.isRemote && !THE_WORLDUtil.isEntityStopper(this, Minecraft.getMinecraft().player)) {
                 ci.cancel();
                 return;
             }
@@ -253,7 +263,7 @@ public abstract class WorldMixin implements WorldInvoker {
 
     @Inject(method = "updateEntity", at = @At("HEAD"), cancellable = true)
     private void updateEntity(Entity entity, CallbackInfo ci) {
-        if (WorldInvoker.stopping(this) && entity instanceof EntityPlayer && !(entity.equals(WorldInvoker.invoker(this).getStopper()))) {
+        if (WorldInvoker.stopping(this) && entity instanceof EntityPlayer && !THE_WORLDUtil.isEntityStopper(this, entity)) {
             ci.cancel();
         }
     }

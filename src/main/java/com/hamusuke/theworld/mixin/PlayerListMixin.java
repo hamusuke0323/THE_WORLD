@@ -1,5 +1,6 @@
 package com.hamusuke.theworld.mixin;
 
+import com.hamusuke.theworld.THE_WORLDUtil;
 import com.hamusuke.theworld.invoker.EntityPlayerInvoker;
 import com.hamusuke.theworld.invoker.WorldInvoker;
 import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
@@ -26,7 +27,7 @@ public abstract class PlayerListMixin {
     @Inject(method = "playerLoggedOut", at = @At("HEAD"))
     private void playerLoggedOut(EntityPlayerMP playerIn, CallbackInfo ci) {
         WorldInvoker invoker = WorldInvoker.invoker(playerIn.world);
-        if (invoker.timeStopping() && playerIn.equals(invoker.getStopper())) {
+        if (THE_WORLDUtil.isEntityStopper(playerIn.world, playerIn)) {
             invoker.startTime(playerIn);
         }
     }

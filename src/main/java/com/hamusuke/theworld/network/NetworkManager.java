@@ -1,10 +1,7 @@
 package com.hamusuke.theworld.network;
 
 import com.hamusuke.theworld.network.packet.c2s.*;
-import com.hamusuke.theworld.network.packet.s2c.PlayerSetIsInEffectS2CPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDStopsTimeS2CPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDSuccessS2CPacket;
-import com.hamusuke.theworld.network.packet.s2c.THE_WORLDTimeOverS2CPacket;
+import com.hamusuke.theworld.network.packet.s2c.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -33,6 +30,7 @@ public final class NetworkManager {
     }
 
     private static void registerServer2ClientPackets() {
+        INSTANCE.registerMessage(AskClientToReleaseTHE_WORLDEffectsS2CPacket.class, AskClientToReleaseTHE_WORLDEffectsS2CPacket.class, generator.get(), Side.CLIENT);
         INSTANCE.registerMessage(PlayerSetIsInEffectS2CPacket.class, PlayerSetIsInEffectS2CPacket.class, generator.get(), Side.CLIENT);
         INSTANCE.registerMessage(THE_WORLDStopsTimeS2CPacket.class, THE_WORLDStopsTimeS2CPacket.class, generator.get(), Side.CLIENT);
         INSTANCE.registerMessage(THE_WORLDSuccessS2CPacket.class, THE_WORLDSuccessS2CPacket.class, generator.get(), Side.CLIENT);
