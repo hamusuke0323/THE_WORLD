@@ -1,0 +1,11 @@
+{
+  "theworld.config.title": "ザ・ワールド！ 設定を変えるッ！！",
+  "theworld.category.common": "共通（クライアント側・サーバー側）",
+  "theworld.key.THE_WORLD": "ザ・ワールドッ！！時よ止まれい！！",
+  "theworld.key.release.leashed": "リードで繋がれたエンティティを放す",
+  "theworld.key.category": "THE WORLD",
+  "theworld.config.allowFly": "時間停止中に飛行を許可する",
+  "theworld.config.autoTheWorld": "自動でザ・ワールドを宣言する",
+  "theworld.config.timeLimit": "タイムリミットのティック",
+  "theworld.config.maxCoolDown": "クールタイムの最大ティック"
+}

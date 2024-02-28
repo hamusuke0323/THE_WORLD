@@ -1,0 +1,11 @@
+{
+  "theworld.config.title": "时光之力配置",
+  "theworld.category.common": "常规（客户端与服务端）",
+  "theworld.key.THE_WORLD": "时间暂停",
+  "theworld.key.release.leashed": "释放被栓绳牵引的实体",
+  "theworld.key.category": "时光之力",
+  "theworld.config.allowFly": "Allow Fly When Time Stopping",
+  "theworld.config.autoTheWorld": "Auto THE WORLD",
+  "theworld.config.timeLimit": "Time Limit Ticks",
+  "theworld.config.maxCoolDown": "Max Cool Down Ticks"
+}

@@ -1,0 +1,31 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.hamusuke.theworld.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractArrowMixin",
+    "EnderManMixin",
+    "EntityMixin",
+    "FallingBlockEntityMixin",
+    "LevelMixin",
+    "LivingEntityMixin",
+    "LookControlMixin",
+    "MobMixin",
+    "PlayerListMixin",
+    "PlayerMixin",
+    "ProjectileMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerLevelMixin",
+    "TickRateManagerMixin"
+  ],
+  "client": [
+    "client.ClientLevelMixin",
+    "client.GameRendererMixin",
+    "client.GuiMixin",
+    "client.LevelRendererMixin",
+    "client.MinecraftMixin",
+    "client.SoundManagerMixin"
+  ],
+  "refmap": "mixins.theworld.refmap.json"
+}
