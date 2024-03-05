@@ -7,7 +7,6 @@ import com.hamusuke.theworld.network.NetworkManager;
 import com.hamusuke.theworld.network.packet.c2s.ReleaseLeashedEntitiesReq;
 import com.hamusuke.theworld.network.packet.c2s.ReleaseTheWorldReq;
 import com.hamusuke.theworld.network.packet.c2s.TheWorldReq;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,9 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.ScreenEvent.Render;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -78,7 +75,7 @@ public final class TheWorldClient {
                 f = 2.0F - f;
             }
 
-            Objects.requireNonNull(mc.player).spinningEffectIntensity = f * 1.5F;
+            Objects.requireNonNull(mc.player).spinningEffectIntensity = (float) invoker.getInverseTick() / THE_WORLD_EFFECT_TICK;
             f *= 5.0F;
             int i = event.getWindow().getGuiScaledWidth();
             int j = event.getWindow().getGuiScaledHeight();
