@@ -59,7 +59,7 @@ public abstract class MobMixin extends LivingEntityMixin implements MobInvoker {
 
     @Inject(method = "serverAiStep", at = @At("HEAD"), cancellable = true)
     private void serverAiStep(CallbackInfo ci) {
-        if (!LevelInvoker.stopping(this.level())) {
+        if (!this.level().tickRateManager().isEntityFrozen((Mob) (Object) this)) {
             return;
         }
 

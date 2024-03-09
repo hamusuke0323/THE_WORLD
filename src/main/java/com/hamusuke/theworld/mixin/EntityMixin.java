@@ -65,19 +65,27 @@ public abstract class EntityMixin {
     @Shadow
     public abstract void addDeltaMovement(Vec3 p_250128_);
 
-    @Shadow public abstract void setYRot(float p_146923_);
+    @Shadow
+    public abstract void setYRot(float p_146923_);
 
-    @Shadow public abstract void setXRot(float p_146927_);
+    @Shadow
+    public abstract void setXRot(float p_146927_);
 
-    @Shadow public float yRotO;
+    @Shadow
+    public float yRotO;
 
-    @Shadow public float xRotO;
+    @Shadow
+    public float xRotO;
 
-    @Shadow public abstract float getXRot();
+    @Shadow
+    public abstract float getXRot();
 
-    @Shadow public abstract float getYRot();
+    @Shadow
+    public abstract float getYRot();
 
-    @Shadow @Final protected RandomSource random;
+    @Shadow
+    @Final
+    protected RandomSource random;
 
     @Inject(method = "checkFallDamage", at = @At("HEAD"), cancellable = true)
     private void checkFallDamage(double p_19911_, boolean p_19912_, BlockState p_19913_, BlockPos p_19914_, CallbackInfo ci) {
@@ -135,7 +143,7 @@ public abstract class EntityMixin {
 
     @Inject(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At("HEAD"), cancellable = true)
     private void playSound(SoundEvent p_19938_, float p_19939_, float p_19940_, CallbackInfo ci) {
-        if (LevelInvoker.stopping(this.level) && !((Object) this instanceof Player)) {
+        if (this.level().tickRateManager().isEntityFrozen((Entity) (Object) this) && !((Object) this instanceof Player)) {
             ci.cancel();
         }
     }
