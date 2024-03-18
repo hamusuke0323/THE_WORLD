@@ -1,6 +1,5 @@
 package com.hamusuke.theworld.client;
 
-import com.hamusuke.theworld.TheWorld;
 import com.hamusuke.theworld.invoker.LevelInvoker;
 import com.hamusuke.theworld.invoker.MinecraftInvoker;
 import com.hamusuke.theworld.network.NetworkManager;
@@ -23,16 +22,17 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Objects;
 
+import static com.hamusuke.theworld.TheWorld.MOD_ID;
 import static com.hamusuke.theworld.TheWorldUtil.THE_WORLD_EFFECT_TICK;
 
 @OnlyIn(Dist.CLIENT)
 public final class TheWorldClient {
-    public static final KeyMapping THE_WORLD_KEY = new KeyMapping(TheWorld.MOD_ID + ".key.THE_WORLD", 47, TheWorld.MOD_ID + ".key.category");
-    public static final KeyMapping RELEASE_LEASHED_KEY = new KeyMapping(TheWorld.MOD_ID + ".key.release.leashed", 48, TheWorld.MOD_ID + ".key.category");
+    public static final KeyMapping THE_WORLD_KEY = new KeyMapping(MOD_ID + ".key.THE_WORLD", 47, MOD_ID + ".key.category");
+    public static final KeyMapping RELEASE_LEASHED_KEY = new KeyMapping(MOD_ID + ".key.release.leashed", 48, MOD_ID + ".key.category");
     private static final Minecraft mc = Minecraft.getInstance();
-    private static final ResourceLocation THE_WORLD_NP_INV = new ResourceLocation(TheWorld.MOD_ID, "textures/the_world_negaposiinv.png");
+    private static final ResourceLocation THE_WORLD_NP_INV = new ResourceLocation(MOD_ID, "textures/the_world_negaposiinv.png");
     private static TheWorldClient INSTANCE;
-    public static final ResourceLocation THE_WORLD_GRAYSCALE_SHADER = new ResourceLocation(TheWorld.MOD_ID, "shaders/post/grayscale.json");
+    public static final ResourceLocation THE_WORLD_GRAYSCALE_SHADER = new ResourceLocation("shaders/post/grayscale.json");
 
     private TheWorldClient() {
         INSTANCE = this;
