@@ -17,6 +17,7 @@ import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
@@ -78,6 +79,13 @@ public class TheWorld {
     private void registerKeyMapping(final RegisterKeyMappingsEvent event) {
         event.register(THE_WORLD_KEY);
         event.register(RELEASE_LEASHED_KEY);
+    }
+
+    @SubscribeEvent
+    public void onLivingFall(final LivingFallEvent e) {
+        if (LevelInvoker.stopping(e.getEntity().level())) {
+            e.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

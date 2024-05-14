@@ -7,13 +7,17 @@ import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 public class TheWorldReq implements Packet {
     @Override
     public boolean handle(Context context) {
-        var player = context.getSender();
-        if (player == null) {
-            return true;
-        }
+        context.enqueueWork(() -> {
+            var player = context.getSender();
+            if (player == null) {
+                return;
+            }
 
-        var world = player.serverLevel();
-        LevelInvoker.invoker(world).stopTime(context.getSender());
+            player.getServer().executeIfPossible(() -> {
+                var world = player.serverLevel();
+                LevelInvoker.invoker(world).stopTime(context.getSender());
+            });
+        });
 
         return true;
     }

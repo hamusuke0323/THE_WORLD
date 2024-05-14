@@ -87,13 +87,6 @@ public abstract class EntityMixin {
     @Final
     protected RandomSource random;
 
-    @Inject(method = "checkFallDamage", at = @At("HEAD"), cancellable = true)
-    private void checkFallDamage(double p_19911_, boolean p_19912_, BlockState p_19913_, BlockPos p_19914_, CallbackInfo ci) {
-        if (LevelInvoker.stopping(this.level())) {
-            ci.cancel();
-        }
-    }
-
     @Inject(method = "tick", at = @At("HEAD"))
     private void tick(CallbackInfo ci) {
         this.vecDirty = false;

@@ -3,7 +3,6 @@ package com.hamusuke.theworld.mixin.client;
 import com.hamusuke.theworld.client.TheWorldClient;
 import com.hamusuke.theworld.invoker.LevelInvoker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -34,7 +33,7 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "checkEntityPostEffect", at = @At("HEAD"), cancellable = true)
     private void loadEntityShader(Entity entityIn, CallbackInfo ci) {
-        if ((entityIn == null || entityIn instanceof LocalPlayer) && LevelInvoker.stopping(this.minecraft.level)) {
+        if (LevelInvoker.stopping(this.minecraft.level)) {
             this.loadEffect(TheWorldClient.THE_WORLD_GRAYSCALE_SHADER);
             ci.cancel();
         }
